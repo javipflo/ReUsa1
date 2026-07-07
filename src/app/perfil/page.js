@@ -22,7 +22,33 @@ export default function Perfil() {
         .single();
       
       if (profile) setUserData(profile);
+{activeTab === 'datos' && (
+  <div>
+    <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Datos Personales</h2>
+    <div className="space-y-5">
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre</label>
+        <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
+      </div>
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo electrónico</label>
+        <input type="email" disabled={true} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50 text-gray-500" value={userData.email} />
+      </div>
+      
+      {/* Botón de Cambiar Contraseña */}
+      <button 
+        onClick={() => supabase.auth.resetPasswordForEmail(userData.email)} 
+        className="text-sm font-semibold text-green-600 hover:text-green-700 underline"
+      >
+        ¿Quieres cambiar tu contraseña?
+      </button>
 
+      <button onClick={() => setEditando(!editando)} className={`w-full py-3 rounded-xl font-bold transition ${editando ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
+        {editando ? "Guardar cambios" : "Editar Perfil"}
+      </button>
+    </div>
+  </div>
+)}
       // 2. Cargar publicaciones o solicitados
       if (activeTab === "publicaciones" || activeTab === "solicitados") {
         let query = activeTab === "publicaciones" 
