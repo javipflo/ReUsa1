@@ -28,7 +28,7 @@ export default function Explorar() {
     <main className="min-h-screen bg-[#e6fcf0] p-6 md:p-10">
       <h1 className="text-4xl font-bold text-purple-700 mb-8">Explorar productos</h1>
       
-      {/* Selector blanco con sombra para mayor contraste */}
+      {/*  contraste */}
       <select 
         onChange={(e) => setFiltro(e.target.value)} 
         className="mb-6 p-3 border rounded-lg w-full md:w-64 bg-white shadow-sm border-gray-200"
