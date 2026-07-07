@@ -24,7 +24,7 @@ export default function ChatPage() {
         .from("conversaciones")
         .select("*")
         .eq("producto_id", productoId)
-        .maybeSingle(); // Usamos maybeSingle para evitar errores si no existe
+        .maybeSingle();
 
       if (conv) {
         setConversacion(conv);
@@ -44,7 +44,6 @@ export default function ChatPage() {
     
     let convId = conversacion?.id;
 
-    // Si no hay chat, intentamos crearlo
     if (!convId) {
       const { data: nuevaConv, error } = await supabase
         .from("conversaciones")
@@ -53,32 +52,38 @@ export default function ChatPage() {
         .single();
         
       if (error) {
-        console.error("Error al crear:", error);
-        alert("Error al iniciar el chat. Verifica si RLS está desactivado.");
+        console.error("Error al crear chat:", error);
+        alert("Error al crear chat: " + error.message);
         return;
       }
       convId = nuevaConv.id;
       setConversacion(nuevaConv);
     }
 
+    // Nota: Si el error persiste, verifica si en Supabase la columna es 'sender_id' o 'user_id'
     const { error } = await supabase.from("mensajes").insert([
       { conversacion_id: convId, sender_id: usuarioActual.id, contenido: input }
     ]);
     
-    if (!error) setInput("");
+    if (error) {
+      console.error("Error al enviar mensaje:", error);
+      alert("Error al enviar: " + error.message);
+    } else {
+      setInput("");
+      const { data: msg } = await supabase.from("mensajes").select("*").eq("conversacion_id", convId).order("created_at", { ascending: true });
+      setMensajes(msg || []);
+    }
   };
 
   return (
-    //  chat
     <main className="min-h-screen bg-[#e6fcf0] p-6 flex flex-col items-center">
       <div className="w-full max-w-2xl">
         <div className="bg-white p-4 rounded-2xl shadow-sm mb-4 font-bold text-lg text-purple-700 text-center">
           Chat sobre: {producto?.nombre || "Cargando..."}
         </div>
 
-        {/* Chat con fondo blanco */}
         <div className="bg-white p-6 rounded-2xl shadow-md mb-4 h-[60vh] overflow-y-auto border border-gray-100">
-          {mensajes.length === 0 && <p className="text-gray-400 text-center">No hay mensajes aún. ¡Saluda!</p>}
+          {mensajes.length === 0 && <p className="text-gray-400 text-center">No hay mensajes aún.</p>}
           {mensajes.map((m) => (
             <div key={m.id} className={`mb-4 ${m.sender_id === usuarioActual?.id ? "text-right" : "text-left"}`}>
               <p className={`inline-block p-3 rounded-2xl ${m.sender_id === usuarioActual?.id ? "bg-green-600 text-white" : "bg-gray-100 text-gray-800"}`}>
