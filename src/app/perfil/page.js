@@ -33,22 +33,17 @@ export default function Perfil() {
         setItems(data || []);
       } 
       // 3. Cargar chats
-      else if (activeTab === 'chats') {
+      // Reemplaza el bloque actual por este:
+else if (activeTab === 'chats') {
   const { data } = await supabase
     .from('conversaciones')
-    .select(`
-      id, 
-      producto_id,
-      productos (
-        nombre, 
-        imagen_url
-      )
-    `)
-    .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id},productos.usuario_id.eq.${user.id}`);
-    
+    .select(`id, producto:producto_id (nombre, imagen_url)`)
+    .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id}`);
+  
   setChats(data || []);
+};
 }
-    };
+    
     fetchData();
   }, [activeTab]);
 
