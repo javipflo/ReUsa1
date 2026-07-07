@@ -69,7 +69,7 @@ export default function ChatPage() {
   };
 
   return (
-    // Fondo claro con contenedor central blanco para el chat
+    //  chat
     <main className="min-h-screen bg-[#e6fcf0] p-6 flex flex-col items-center">
       <div className="w-full max-w-2xl">
         <div className="bg-white p-4 rounded-2xl shadow-sm mb-4 font-bold text-lg text-purple-700 text-center">
