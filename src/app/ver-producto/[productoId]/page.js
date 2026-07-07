@@ -61,7 +61,7 @@ export default function VerProducto() {
         </a>
 
         <div className="mt-8 bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-          {/* Imagen completa (Diseño original) */}
+          {/* Imagen completa  */}
           <div className="h-72 md:h-96 bg-gray-200 flex items-center justify-center overflow-hidden">
             {producto.imagen_url ? (
               <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
@@ -73,7 +73,7 @@ export default function VerProducto() {
           <div className="p-6 md:p-8">
             <h1 className="text-4xl font-bold text-purple-700 mb-4">{producto.nombre}</h1>
 
-            {/* Información detallada (Diseño original) */}
+            {/* Información detallada  */}
             <div className="space-y-3 text-gray-700 text-lg">
               <p><strong>Tipo de material:</strong> {producto.tipo}</p>
               <p><strong>Peso:</strong> {producto.peso_kg ? `${producto.peso_kg} kg` : "No especificado"}</p>
