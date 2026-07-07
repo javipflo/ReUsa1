@@ -8,14 +8,14 @@ export default function Perfil() {
   const [items, setItems] = useState([]);
   const [chats, setChats] = useState([]);
   const [editando, setEditando] = useState(false);
-  const [userData, setUserData] = useState({ nombre: "usuario", email: "" });
+  const [userData, setUserData] = useState({ nombre: "Cargando...", email: "" });
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Carga de datos de perfil real
+      // 1. Cargar datos del perfil del usuario logueado
       const { data: profile } = await supabase
         .from("profiles")
         .select("nombre, email")
@@ -24,7 +24,7 @@ export default function Perfil() {
       
       if (profile) setUserData(profile);
 
-      // Lógica de publicaciones y solicitados
+      // 2. Cargar publicaciones o solicitados según la pestaña
       if (activeTab === "publicaciones" || activeTab === "solicitados") {
         let query = activeTab === "publicaciones" 
           ? supabase.from("productos").select("*").eq("usuario_id", user.id)
@@ -32,7 +32,7 @@ export default function Perfil() {
         const { data } = await query;
         setItems(data || []);
       } 
-      // Lógica de chats
+      // 3. Cargar chats
       else if (activeTab === "chats") {
         const { data } = await supabase
           .from("conversaciones")
@@ -77,11 +77,11 @@ export default function Perfil() {
             <div className="space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre</label>
-                <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
+                <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-green-500" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo electrónico</label>
-                <input type="email" disabled={true} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.email} />
+                <input type="email" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
               </div>
               <button onClick={() => setEditando(!editando)} className={`w-full py-3 rounded-xl font-bold transition ${editando ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
                 {editando ? "Guardar cambios" : "Editar Perfil"}
@@ -114,8 +114,8 @@ export default function Perfil() {
           <div>
             <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Chats</h2>
             {chats.map((chat) => (
-              <Link href={`/chat/${chat.id}`} key={chat.id} className="bg-gray-50 p-4 rounded-2xl flex items-center gap-4 hover:bg-gray-100 transition border border-gray-100">
-                <div className="w-14 h-14 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
+              <Link href={`/chat/${chat.id}`} key={chat.id} className="bg-gray-50 p-4 rounded-2xl flex items-center gap-4 mb-3 border border-gray-100">
+                <div className="w-14 h-14 bg-gray-200 rounded-xl overflow-hidden">
                    {chat.producto?.imagen_url && <img src={chat.producto.imagen_url} className="w-full h-full object-cover" />}
                 </div>
                 <div>
