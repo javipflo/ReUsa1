@@ -6,7 +6,7 @@ export default function ComoFunciona() {
       <section className="max-w-6xl mx-auto">
         <div className="mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
-            ¿Cómo funciona ReUsa? 🌱
+            ¿Cómo funciona ReUsa? 
           </h1>
 
           <p className="text-gray-600 text-lg max-w-3xl">
@@ -29,7 +29,7 @@ export default function ComoFunciona() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-purple-600 mb-3">02. Publicar un material 📦</h2>
+            <h2 className="text-2xl font-bold text-purple-600 mb-3">02. Publicar un material </h2>
             <p className="text-gray-700 leading-relaxed">
               Una vez iniciada la sesión, el usuario puede publicar materiales
               reutilizables, indicando el nombre del material, tipo, descripción,
@@ -40,7 +40,7 @@ export default function ComoFunciona() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-purple-600 mb-3">03. Explorar publicaciones 🔍</h2>
+            <h2 className="text-2xl font-bold text-purple-600 mb-3">03. Explorar publicaciones </h2>
             <p className="text-gray-700 leading-relaxed">
               Cualquier persona puede explorar las publicaciones disponibles sin
               necesidad de tener una cuenta. Sin embargo, para solicitar o reservar
@@ -50,7 +50,7 @@ export default function ComoFunciona() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-purple-600 mb-3">04. Solicitar o reservar un material 🛒</h2>
+            <h2 className="text-2xl font-bold text-purple-600 mb-3">04. Solicitar o reservar un material </h2>
             <p className="text-gray-700 leading-relaxed">
               Si un usuario encuentra un material que le interesa, puede solicitarlo o
               reservarlo. Esta acción no representa una compra dentro de la página,
@@ -60,7 +60,7 @@ export default function ComoFunciona() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-purple-600 mb-3">05. Buscar centros cercanos 📍</h2>
+            <h2 className="text-2xl font-bold text-purple-600 mb-3">05. Buscar centros cercanos </h2>
             <p className="text-gray-700 leading-relaxed">
               La plataforma también contempla un apartado de centros cercanos,
               donde se podrán visualizar puntos de acopio o recepción ubicados
@@ -84,12 +84,12 @@ export default function ComoFunciona() {
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
             <h2 className="text-2xl font-bold text-purple-600 mb-3">07. Limitaciones de la plataforma ⚠️</h2>
             <ul className="list-disc pl-6 text-gray-700 leading-relaxed space-y-2">
-              <li>❌ No realiza pagos ni transacciones dentro de la página.</li>
-              <li>📦 No almacena físicamente los materiales publicados.</li>
-              <li>🚫 No realiza transporte ni retiro directo de productos.</li>
-              <li>♻️ No funciona como empresa recicladora o gestora de residuos.</li>
-              <li>⏱️ No garantiza disponibilidad inmediata de usuarios interesados o centros de acopio.</li>
-              <li>📍 En esta primera versión, el alcance territorial se enfoca en la comuna de Ñuñoa.</li>
+              <li> No realiza pagos ni transacciones dentro de la página.</li>
+              <li> No almacena físicamente los materiales publicados.</li>
+              <li> No realiza transporte ni retiro directo de productos.</li>
+              <li> No funciona como empresa recicladora o gestora de residuos.</li>
+              <li> No garantiza disponibilidad inmediata de usuarios interesados o centros de acopio.</li>
+              <li> En esta primera versión, el alcance territorial se enfoca en la comuna de Ñuñoa.</li>
             </ul>
           </div>
         </div>

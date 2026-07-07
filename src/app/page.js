@@ -42,7 +42,7 @@ export default function Home() {
           </div>
 
           <p className="mt-8 text-gray-500">
-            🌱 Menos residuos, más reutilización.
+            Menos residuos, más reutilización.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function Home() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
-          <div className="text-5xl mb-5">🤝</div>
+          <div className="text-5xl mb-5"></div>
           <h4 className="text-2xl font-bold mb-4">Conecta</h4>
           <p className="text-gray-600 leading-relaxed">
             Explora publicaciones y solicita materiales disponibles para
@@ -76,7 +76,7 @@ export default function Home() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
-          <div className="text-5xl mb-5">📍</div>
+          <div className="text-5xl mb-5"></div>
           <h4 className="text-2xl font-bold mb-4">Centros cercanos</h4>
           <p className="text-gray-600 leading-relaxed">
             Busca centros de acopio cercanos a tu dirección referencial dentro

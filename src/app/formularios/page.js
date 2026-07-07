@@ -57,7 +57,7 @@ export default function FormulariosPage() {
         <button onClick={() => router.back()} className="text-purple-600 font-bold hover:underline">← Volver</button>
       </div>
 
-      <h1 className="text-4xl font-bold text-purple-700 mb-8">Bandeja de Formularios 📥</h1>
+      <h1 className="text-4xl font-bold text-purple-700 mb-8">Bandeja de Formularios </h1>
 
       <section className="grid gap-6">
         {formularios.length === 0 ? (
@@ -78,7 +78,7 @@ export default function FormulariosPage() {
   }}
   className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition"
 >
-  Copiar correo para responder 📧
+  Copiar correo para responder 
 
                 </button>
               </div>
@@ -96,7 +96,7 @@ export default function FormulariosPage() {
                 }}
                 className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition"
               >
-                Eliminar 🗑️
+                Eliminar 
               </button>
             </div>
           ))
