@@ -22,33 +22,7 @@ export default function Perfil() {
         .single();
       
       if (profile) setUserData(profile);
-{activeTab === 'datos' && (
-  <div>
-    <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Datos Personales</h2>
-    <div className="space-y-5">
-      <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre</label>
-        <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
-      </div>
-      <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo electrónico</label>
-        <input type="email" disabled={true} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50 text-gray-500" value={userData.email} />
-      </div>
-      
-      {/* Botón de Cambiar Contraseña */}
-      <button 
-        onClick={() => supabase.auth.resetPasswordForEmail(userData.email)} 
-        className="text-sm font-semibold text-green-600 hover:text-green-700 underline"
-      >
-        ¿Quieres cambiar tu contraseña?
-      </button>
 
-      <button onClick={() => setEditando(!editando)} className={`w-full py-3 rounded-xl font-bold transition ${editando ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
-        {editando ? "Guardar cambios" : "Editar Perfil"}
-      </button>
-    </div>
-  </div>
-)}
       // 2. Cargar publicaciones o solicitados
       if (activeTab === "publicaciones" || activeTab === "solicitados") {
         let query = activeTab === "publicaciones" 
@@ -67,7 +41,7 @@ export default function Perfil() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         
-        const me = new Talk.User({ id: user.id, name: user.email });
+        const me = new Talk.User({ id: user.id, name: user.email, locale: "es-ES" });
         const session = new Talk.Session({ appId: "tNmopj3a", me });
         
         const inbox = session.createInbox();
@@ -107,8 +81,22 @@ export default function Perfil() {
           <div>
             <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Datos Personales</h2>
             <div className="space-y-5">
-              <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
-              <input type="email" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre</label>
+                <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo electrónico</label>
+                <input type="email" disabled={true} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50 text-gray-500" value={userData.email} />
+              </div>
+              
+              <button 
+                onClick={() => supabase.auth.resetPasswordForEmail(userData.email)} 
+                className="text-sm font-semibold text-green-600 hover:text-green-700 underline"
+              >
+                ¿Quieres cambiar tu contraseña?
+              </button>
+
               <button onClick={() => setEditando(!editando)} className={`w-full py-3 rounded-xl font-bold transition ${editando ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
                 {editando ? "Guardar cambios" : "Editar Perfil"}
               </button>
@@ -137,9 +125,7 @@ export default function Perfil() {
         )}
 
         {activeTab === 'chats' && (
-          <div id="talkjs-inbox-container" style={{ height: '500px', width: '100%' }}>
-            {/* TalkJS cargará aquí */}
-          </div>
+          <div id="talkjs-inbox-container" style={{ height: '500px', width: '100%' }} />
         )}
       </div>
     </main>
