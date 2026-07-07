@@ -1,114 +1,107 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Publicar() {
-  const [logueado, setLogueado] = useState(true); // simulando usuario logueado
   const [formulario, setFormulario] = useState({
-    nombre: "Caja de cartón grande",
+    nombre: "",
     tipo: "Cartón",
-    descripcion: "Caja de cartón reciclable en buen estado, útil para mudanza o almacenamiento.",
-    ubicacion: "Ñuñoa, cerca de Plaza Ñuñoa",
-    contacto: "correo@example.com",
+    descripcion: "",
+    ubicacion: "",
+    peso_kg: "",
   });
 
+  const [imagen, setImagen] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setFormulario({
-      ...formulario,
-      [e.target.name]: e.target.value,
-    });
+    setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
-  const handlePublicar = (e) => {
+  const handlePublicar = async (e) => {
     e.preventDefault();
-    alert("¡Publicación creada correctamente! (Simulación de ejemplo)");
+    setLoading(true);
+
+    try {
+      // 1. Obtener usuario
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("Debes iniciar sesión para publicar");
+
+      let imagenUrl = null;
+
+      // 2. Subir imagen a Storage si existe
+      if (imagen) {
+        const fileExt = imagen.name.split(".").pop();
+        const fileName = `${user.id}/${Math.random()}.${fileExt}`;
+        
+        const { error: storageError } = await supabase.storage
+          .from("materiales")
+          .upload(fileName, imagen);
+
+        if (storageError) throw storageError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from("materiales")
+          .getPublicUrl(fileName);
+        
+        imagenUrl = publicUrlData.publicUrl;
+      }
+
+      // 3. Guardar en tabla productos
+      const { error: dbError } = await supabase.from("productos").insert([
+        {
+          nombre: formulario.nombre,
+          tipo: formulario.tipo,
+          descripcion: formulario.descripcion,
+          ubicacion: formulario.ubicacion,
+          peso_kg: parseFloat(formulario.peso_kg) || 0,
+          imagen_url: imagenUrl,
+          estado: "Disponible",
+          usuario_id: user.id,
+        },
+      ]);
+
+      if (dbError) throw dbError;
+
+      alert("¡Publicado con éxito!");
+      
+      // Limpiar formulario
+      setFormulario({ nombre: "", tipo: "Cartón", descripcion: "", ubicacion: "", peso_kg: "" });
+      setImagen(null);
+    } catch (error) {
+      console.error("Error detallado:", error);
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="min-h-screen bg-[#f5f7f5] p-6 md:p-10 text-gray-900">
-      <h1 className="text-4xl font-bold text-purple-700 mb-6">Publicar material (Ejemplo)</h1>
+      <h1 className="text-4xl font-bold text-purple-700 mb-6">Publicar material</h1>
 
-      {!logueado && (
-        <p className="text-red-600 mb-6">
-          Debes iniciar sesión para publicar un material.
-        </p>
-      )}
+      <form onSubmit={handlePublicar} className="bg-white rounded-2xl shadow-md p-6 md:p-8 grid gap-6">
+        <input name="nombre" value={formulario.nombre} onChange={handleChange} placeholder="Nombre del material" className="border p-3 rounded-lg" required />
+        
+        <input name="peso_kg" type="number" step="0.1" value={formulario.peso_kg} onChange={handleChange} placeholder="Peso en kg (ej: 2.5)" className="border p-3 rounded-lg" required />
 
-      <form
-        onSubmit={handlePublicar}
-        className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 grid gap-6"
-      >
-        <div>
-          <label className="block font-semibold mb-2">Nombre del material</label>
-          <input
-            type="text"
-            name="nombre"
-            value={formulario.nombre}
-            onChange={handleChange}
-            placeholder="Ej: Caja de cartón, botellas de vidrio, latas limpias"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3"
-          />
+        <div className="border p-3 rounded-lg">
+          <label className="block text-sm text-gray-500 mb-2">Imagen del material:</label>
+          <input type="file" accept="image/*" onChange={(e) => setImagen(e.target.files[0])} />
         </div>
 
-        <div>
-          <label className="block font-semibold mb-2">Tipo de material</label>
-          <select
-            name="tipo"
-            value={formulario.tipo}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3"
-          >
-            <option value="Cartón">Cartón</option>
-            <option value="Lata">Lata</option>
-            <option value="Vidrio">Vidrio</option>
-          </select>
-        </div>
+        <select name="tipo" value={formulario.tipo} onChange={handleChange} className="border p-3 rounded-lg">
+          <option value="Cartón">Cartón</option>
+          <option value="Lata">Lata</option>
+          <option value="Vidrio">Vidrio</option>
+        </select>
 
-        <div>
-          <label className="block font-semibold mb-2">Descripción</label>
-          <textarea
-            name="descripcion"
-            value={formulario.descripcion}
-            onChange={handleChange}
-            placeholder="Ej: Caja grande para mudanza, limpia y sin daños"
-            rows="4"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3"
-          />
-        </div>
+        <textarea name="descripcion" value={formulario.descripcion} onChange={handleChange} placeholder="Descripción" className="border p-3 rounded-lg" required />
+        <input name="ubicacion" value={formulario.ubicacion} onChange={handleChange} placeholder="Ubicación" className="border p-3 rounded-lg" />
 
-        <div>
-          <label className="block font-semibold mb-2">Ubicación referencial</label>
-          <input
-            type="text"
-            name="ubicacion"
-            value={formulario.ubicacion}
-            onChange={handleChange}
-            placeholder="Ej: Ñuñoa, cerca de Plaza Ñuñoa"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3"
-          />
-        </div>
-
-        <div>
-          <label className="block font-semibold mb-2">Contacto</label>
-          <input
-            type="text"
-            name="contacto"
-            value={formulario.contacto}
-            onChange={handleChange}
-            placeholder="Ej: correo@example.com"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3"
-          />
-        </div>
-
-        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center text-gray-500 bg-gray-50">
-          Imagen del producto (simulación)
-        </div>
-
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700"
-        >
-          Publicar material
+        <button type="submit" disabled={loading} className="bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-700 transition">
+          {loading ? "Procesando..." : "Publicar material"}
         </button>
       </form>
     </main>

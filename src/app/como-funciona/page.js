@@ -71,7 +71,7 @@ export default function ComoFunciona() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-purple-600 mb-3">06. Rol del administrador 👨‍💼</h2>
+            <h2 className="text-2xl font-bold text-purple-600 mb-3">06. Rol del administrador </h2>
             <p className="text-gray-700 leading-relaxed">
               El administrador no modifica directamente los productos publicados
               por los usuarios, pero sí puede revisar y eliminar publicaciones
@@ -94,50 +94,7 @@ export default function ComoFunciona() {
           </div>
         </div>
       </section>
-{/* Sección de contacto con fondo morado */}
-<div className="mt-12 bg-purple-600 py-12 px-6 md:px-10 -mx-6 md:-mx-10">
-<div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-md p-8">
-    <h2 className="text-2xl font-bold text-purple-700 mb-4">
-      ¿Tienes preguntas o necesitas ayuda? 💬
-    </h2>
-    <p className="text-gray-700 mb-6">
-      Envía tu consulta y el administrador podrá responderte.
-    </p>
 
-    <form
-      className="grid gap-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        alert("Tu mensaje ha sido enviado. El administrador podrá responderte.");
-      }}
-    >
-      <input
-        type="text"
-        placeholder="Nombre"
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
-      />
-
-      <input
-        type="email"
-        placeholder="Correo electrónico"
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
-      />
-
-      <textarea
-        placeholder="Escribe tu mensaje..."
-        rows="4"
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
-      />
-
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700"
-      >
-        Enviar
-      </button>
-    </form>
-  </div>
-</div>
     </main>
   );
 }
