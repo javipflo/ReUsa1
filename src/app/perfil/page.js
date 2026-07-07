@@ -36,8 +36,15 @@ export default function Perfil() {
       else if (activeTab === 'chats') {
   const { data } = await supabase
     .from('conversaciones')
-    .select(`id, producto_id, producto:productos(nombre, imagen_url, usuario_id)`)
-    .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id},productos.usuario_id.eq.${user.id}`, { foreignTable: 'productos' });
+    .select(`
+      id, 
+      producto_id,
+      productos (
+        nombre, 
+        imagen_url
+      )
+    `)
+    .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id},productos.usuario_id.eq.${user.id}`);
     
   setChats(data || []);
 }
