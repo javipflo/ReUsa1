@@ -170,10 +170,10 @@ export default function Centros() {
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
-              Centros cercanos 📍
+              Centros cercanos 
             </h1>
             <p className="text-gray-600 text-lg max-w-3xl">
-              En la versiòn actual, ReUsa se enfoca sólo en la comuna de Ñuñoa.
+              En la versión actual, ReUsa se enfoca sólo en la comuna de Ñuñoa.
               Aquí puedes revisar algunos puntos de acopio disponibles para
               materiales como vidrio, cartón y latas. Y si buscas opciones para otros materiales, puedes revisar en el mapa.
             </p>

@@ -58,7 +58,7 @@ export default function Home() {
       {/* Cards */}
       <section className="grid md:grid-cols-3 gap-6 px-6 md:px-10 pb-20 max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
-          <div className="text-5xl mb-5">♻️</div>
+          <div className="text-5xl mb-5"></div>
           <h4 className="text-2xl font-bold mb-4">Reutiliza</h4>
           <p className="text-gray-600 leading-relaxed">
             Publica materiales que ya no utilices y permite que otras personas
@@ -70,7 +70,7 @@ export default function Home() {
           <div className="text-5xl mb-5"></div>
           <h4 className="text-2xl font-bold mb-4">Conecta</h4>
           <p className="text-gray-600 leading-relaxed">
-            Explora publicaciones y solicita materiales disponibles para
+            Explora publicaciones y solicita materiales disponibles de tu interés para
             coordinar su retiro con el publicador.
           </p>
         </div>
