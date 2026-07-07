@@ -11,6 +11,7 @@ export default function ChatPage() {
   const [producto, setProducto] = useState(null);
   const [usuarioActual, setUsuarioActual] = useState(null);
 
+  // 1. Efecto de carga inicial
   useEffect(() => {
     const initChat = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -24,6 +25,7 @@ export default function ChatPage() {
         .from("conversaciones")
         .select("*")
         .eq("producto_id", productoId)
+        .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id}`) // Asegura que solo traiga chats del usuario
         .maybeSingle();
 
       if (conv) {
@@ -39,6 +41,27 @@ export default function ChatPage() {
     initChat();
   }, [productoId]);
 
+  // 2. Efecto para tiempo real (solo se ejecuta si hay conversacion.id)
+  useEffect(() => {
+    if (!conversacion?.id) return;
+
+    const channel = supabase
+      .channel('realtime:mensajes')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'mensajes',
+        filter: `conversacion_id=eq.${conversacion.id}` 
+      }, (payload) => {
+        setMensajes((prev) => [...prev, payload.new]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversacion?.id]);
+
   const enviarMensaje = async () => {
     if (!input.trim() || !usuarioActual) return;
     
@@ -52,7 +75,6 @@ export default function ChatPage() {
         .single();
         
       if (error) {
-        console.error("Error al crear chat:", error);
         alert("Error al crear chat: " + error.message);
         return;
       }
@@ -60,18 +82,14 @@ export default function ChatPage() {
       setConversacion(nuevaConv);
     }
 
-    // Nota: Si el error persiste, verifica si en Supabase la columna es 'sender_id' o 'user_id'
     const { error } = await supabase.from("mensajes").insert([
       { conversacion_id: convId, sender_id: usuarioActual.id, contenido: input }
     ]);
     
     if (error) {
-      console.error("Error al enviar mensaje:", error);
       alert("Error al enviar: " + error.message);
     } else {
       setInput("");
-      const { data: msg } = await supabase.from("mensajes").select("*").eq("conversacion_id", convId).order("created_at", { ascending: true });
-      setMensajes(msg || []);
     }
   };
 
@@ -83,7 +101,7 @@ export default function ChatPage() {
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-md mb-4 h-[60vh] overflow-y-auto border border-gray-100">
-          {mensajes.length === 0 && <p className="text-gray-400 text-center">No hay mensajes aún.</p>}
+          {mensajes.length === 0 && <p className="text-gray-400 text-center">No hay mensajes aún. ¡Saluda!</p>}
           {mensajes.map((m) => (
             <div key={m.id} className={`mb-4 ${m.sender_id === usuarioActual?.id ? "text-right" : "text-left"}`}>
               <p className={`inline-block p-3 rounded-2xl ${m.sender_id === usuarioActual?.id ? "bg-green-600 text-white" : "bg-gray-100 text-gray-800"}`}>
