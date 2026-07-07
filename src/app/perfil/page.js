@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import Link from "next/link";
+import Talk from "talkjs";
 
 export default function Perfil() {
   const [activeTab, setActiveTab] = useState("datos");
   const [items, setItems] = useState([]);
-  const [chats, setChats] = useState([]);
   const [editando, setEditando] = useState(false);
   const [userData, setUserData] = useState({ nombre: "Cargando...", email: "" });
 
@@ -15,7 +14,7 @@ export default function Perfil() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // 1. Cargar datos del perfil del usuario logueado
+      // 1. Cargar datos del perfil
       const { data: profile } = await supabase
         .from("profiles")
         .select("nombre, email")
@@ -24,27 +23,31 @@ export default function Perfil() {
       
       if (profile) setUserData(profile);
 
-      // 2. Cargar publicaciones o solicitados según la pestaña
+      // 2. Cargar publicaciones o solicitados
       if (activeTab === "publicaciones" || activeTab === "solicitados") {
         let query = activeTab === "publicaciones" 
           ? supabase.from("productos").select("*").eq("usuario_id", user.id)
           : supabase.from("productos").select("*").eq("solicitante_id", user.id);
         const { data } = await query;
         setItems(data || []);
-      } 
-      // 3. Cargar chats
-      // Reemplaza el bloque actual por este:
-else if (activeTab === 'chats') {
-  const { data } = await supabase
-    .from('conversaciones')
-    .select(`id, producto:producto_id (nombre, imagen_url)`)
-    .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id}`);
-  
-  setChats(data || []);
-};
-}
+      }
+    };
     
     fetchData();
+
+    // 3. Montar Inbox de TalkJS si la pestaña es 'chats'
+    if (activeTab === 'chats') {
+      Talk.ready.then(async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const me = new Talk.User({ id: user.id, name: user.email });
+        const session = new Talk.Session({ appId: "tNmopj3a", me });
+        
+        const inbox = session.createInbox();
+        inbox.mount(document.getElementById('talkjs-inbox-container'));
+      });
+    }
   }, [activeTab]);
 
   const actualizarEstado = async (id, nuevoEstado, removerSolicitante = false) => {
@@ -78,14 +81,8 @@ else if (activeTab === 'chats') {
           <div>
             <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Datos Personales</h2>
             <div className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre</label>
-                <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-green-500" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo electrónico</label>
-                <input type="email" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
-              </div>
+              <input type="text" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.nombre} onChange={(e) => setUserData({...userData, nombre: e.target.value})} />
+              <input type="email" disabled={!editando} className="border border-gray-200 p-3 w-full rounded-xl bg-gray-50" value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
               <button onClick={() => setEditando(!editando)} className={`w-full py-3 rounded-xl font-bold transition ${editando ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
                 {editando ? "Guardar cambios" : "Editar Perfil"}
               </button>
@@ -114,18 +111,8 @@ else if (activeTab === 'chats') {
         )}
 
         {activeTab === 'chats' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6 text-gray-800">Mis Chats</h2>
-            {chats.map((chat) => (
-              <Link href={`/chat/${chat.id}`} key={chat.id} className="bg-gray-50 p-4 rounded-2xl flex items-center gap-4 mb-3 border border-gray-100">
-                <div className="w-14 h-14 bg-gray-200 rounded-xl overflow-hidden">
-                   {chat.producto?.imagen_url && <img src={chat.producto.imagen_url} className="w-full h-full object-cover" />}
-                </div>
-                <div>
-                   <h3 className="font-bold text-gray-800">{chat.producto?.nombre}</h3>
-                </div>
-              </Link>
-            ))}
+          <div id="talkjs-inbox-container" style={{ height: '500px', width: '100%' }}>
+            {/* TalkJS cargará aquí */}
           </div>
         )}
       </div>

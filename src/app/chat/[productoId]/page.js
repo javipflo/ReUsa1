@@ -1,128 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import Talk from "talkjs";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ChatPage() {
   const { productoId } = useParams();
-  const [mensajes, setMensajes] = useState([]);
-  const [input, setInput] = useState("");
-  const [conversacion, setConversacion] = useState(null);
-  const [producto, setProducto] = useState(null);
-  const [usuarioActual, setUsuarioActual] = useState(null);
+  const chatboxRef = useRef(null);
 
-  // 1. Efecto de carga inicial
   useEffect(() => {
     const initChat = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      setUsuarioActual(user);
 
-      const { data: prod } = await supabase.from("productos").select("nombre").eq("id", productoId).single();
-      setProducto(prod);
+      await Talk.ready;
+      
+      const me = new Talk.User({
+        id: user.id,
+        name: user.email, // O puedes buscar su nombre en tu tabla profiles
+      });
 
-      const { data: conv } = await supabase
-        .from("conversaciones")
-        .select("*")
-        .eq("producto_id", productoId)
-        .or(`usuario1_id.eq.${user.id},usuario2_id.eq.${user.id}`) // Asegura que solo traiga chats del usuario
-        .maybeSingle();
+      const session = new Talk.Session({
+        appId: "tNmopj3a",
+        me: me,
+      });
 
-      if (conv) {
-        setConversacion(conv);
-        const { data: msg } = await supabase
-          .from("mensajes")
-          .select("*")
-          .eq("conversacion_id", conv.id)
-          .order("created_at", { ascending: true });
-        setMensajes(msg || []);
-      }
+      const conversation = session.getOrCreateConversation(`prod_${productoId}`);
+      
+      const chatbox = session.createChatbox();
+      chatbox.select(conversation);
+      chatbox.mount(chatboxRef.current);
     };
+
     initChat();
   }, [productoId]);
 
-  // 2. Efecto para tiempo real (solo se ejecuta si hay conversacion.id)
-  useEffect(() => {
-    if (!conversacion?.id) return;
-
-    const channel = supabase
-      .channel('realtime:mensajes')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'mensajes',
-        filter: `conversacion_id=eq.${conversacion.id}` 
-      }, (payload) => {
-        setMensajes((prev) => [...prev, payload.new]);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [conversacion?.id]);
-
-  const enviarMensaje = async () => {
-    if (!input.trim() || !usuarioActual) return;
-    
-    let convId = conversacion?.id;
-
-    if (!convId) {
-      const { data: nuevaConv, error } = await supabase
-        .from("conversaciones")
-        .insert([{ producto_id: productoId, usuario1_id: usuarioActual.id }])
-        .select()
-        .single();
-        
-      if (error) {
-        alert("Error al crear chat: " + error.message);
-        return;
-      }
-      convId = nuevaConv.id;
-      setConversacion(nuevaConv);
-    }
-
-    const { error } = await supabase.from("mensajes").insert([
-      { conversacion_id: convId, sender_id: usuarioActual.id, contenido: input }
-    ]);
-    
-    if (error) {
-      alert("Error al enviar: " + error.message);
-    } else {
-      setInput("");
-    }
-  };
-
-  return (
-    <main className="min-h-screen bg-[#e6fcf0] p-6 flex flex-col items-center">
-      <div className="w-full max-w-2xl">
-        <div className="bg-white p-4 rounded-2xl shadow-sm mb-4 font-bold text-lg text-purple-700 text-center">
-          Chat sobre: {producto?.nombre || "Cargando..."}
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-md mb-4 h-[60vh] overflow-y-auto border border-gray-100">
-          {mensajes.length === 0 && <p className="text-gray-400 text-center">No hay mensajes aún. ¡Saluda!</p>}
-          {mensajes.map((m) => (
-            <div key={m.id} className={`mb-4 ${m.sender_id === usuarioActual?.id ? "text-right" : "text-left"}`}>
-              <p className={`inline-block p-3 rounded-2xl ${m.sender_id === usuarioActual?.id ? "bg-green-600 text-white" : "bg-gray-100 text-gray-800"}`}>
-                {m.contenido}
-              </p>
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex gap-2 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-          <input 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
-            className="flex-1 p-3 rounded-xl outline-none" 
-            placeholder="Escribe un mensaje..." 
-          />
-          <button onClick={enviarMensaje} className="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition">
-            Enviar
-          </button>
-        </div>
-      </div>
-    </main>
-  );
+  return <div ref={chatboxRef} style={{ height: "70vh", width: "100%" }} />;
 }
